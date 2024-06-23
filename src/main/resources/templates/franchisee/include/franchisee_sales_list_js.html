@@ -1,0 +1,739 @@
+<script type="text/javascript" th:fragment="franchisee_sales_list_js">
+
+// ------------ 현재 ------------
+let current_year;			// 현재_년도
+let current_month;			// 현재_월
+let current_date;			// 현재_일
+
+// ------------ 오늘 ------------
+let today = new Date();
+let today_year 	= today.getFullYear();		// 오늘_년도
+let today_month = today.getMonth() + 1;		// 오늘_월
+let today_date 	= today.getDate();			// 오늘_일
+
+// 현재 로그인 된 매장의 no
+
+$(document).ready(function(){
+    console.log('DOCUMENT READY!!')
+    
+    // 현재 날짜 세팅
+    setCurrentDate(today_year, today_month, today_date);
+
+    // select p_date 이달 날짜 입력
+    setCurrentDateSelectOption();
+
+    // select_wrap 현재 일자 세팅
+    setCurrentYearAndMonthSelectUI();
+
+    // input[type="date"] 기본 날짜 세팅
+    setCurrentDateSearchInput();    
+    
+    // 우리매장의 전체 매출 정보 불러오기 (페이지네이션적용)
+	let fcs_no = $('#fc_no').text();
+    console.log("fcs_no--------------->" + fcs_no);
+    ajax_getMyStoreAllSalesInfo(fcs_no);
+    
+    // 이벤트 핸들러 초기화
+    initEvents();
+    
+})
+
+function setCurrentDate(year, month, date) {
+	console.log('setCurrentDate()');
+
+	current_year 	= year;
+	current_month 	= month;
+	current_date 	= date;
+	
+}
+
+// select_wrap 현재 일자 세팅
+function setCurrentYearAndMonthSelectUI() {
+	console.log('setCurrentYearAndMonthSelectUI()');
+	
+	$('#section_wrap select[name="p_year"]').val(current_year).prop('selected', true);
+	$('#section_wrap select[name="p_month"]').val(current_month).prop('selected', true);
+	$('#section_wrap select[name="p_date"]').val(current_date).prop('selected', true);
+
+}
+
+// input[type="date"] 기본 날짜 세팅
+function setCurrentDateSearchInput() {
+    console.log('setCurrentDateSearchInput()');
+
+    let date = new Date();
+    let year = date.getFullYear();
+    let preMonth = ('0' + (date.getMonth())).slice(-2);
+    let month = ('0' + (date.getMonth() + 1)).slice(-2);
+    let day = ('0' + date.getDate()).slice(-2);
+    let preMonthDateStr = `${year}-${preMonth}-${day}`;
+    let dateStr = `${year}-${month}-${day}`;
+
+    // 한달전 날짜 세팅
+    $('#section_wrap .list_search input[name="start_date"]').val(preMonthDateStr);
+    // 현재 날짜 세팅
+    $('#section_wrap .list_search input[name="end_date"]').val(dateStr);
+
+}
+
+// select_wrap 현재 일자 세팅
+function setCurrentDateSelectOption() {
+    console.log('setCurrentDateSelectOption()');
+
+    // -----------------  현재 월 & 첫 날 -------------------
+    let thisDateStart			= new Date(current_year, current_month, 1);
+    let thisDateStart_year		= thisDateStart.getFullYear();			// 이번달_년
+    let thisDateStart_month		= thisDateStart.getMonth();				// 이번달_월
+    let thisDateStart_date		= thisDateStart.getDate();				// 이번달_일
+
+    // -----------------  현재 월 & 마지막 날 -----------------
+    let thisDateEnd				= new Date(current_year, current_month + 1, 0);
+    let thisDateEnd_year		= thisDateEnd.getFullYear();			// 이번달_년
+    let thisDateEnd_month		= thisDateEnd.getMonth();				// 이번달_월
+    let thisDateEnd_date		= thisDateEnd.getDate();				// 이번달_일
+
+    let appendTag = '';
+    console.log("thisDateEnd_date ---- " , thisDateEnd_date);
+
+    // 현재 달 일수 만큼 select option 생성
+    for (let i = 0; i < thisDateEnd_date; i++) {
+
+        appendTag = "<option value='" + parseInt(i+1) + "'>" + parseInt(i+1) + "</option>";
+
+        $('#section_wrap .select_wrap select[name="p_date"]').append(appendTag);
+
+    }
+
+}
+
+function initEvents() {
+    console.log('initEvents()');
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_year"]', function() {
+        console.log('p_year change handler!');
+
+        setYearBySelectChange();
+
+    });
+
+    // select 달 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_month"]', function() {
+        console.log('p_month change handler!');
+
+        setMonthBySelectChange();
+
+    });
+
+    // select 일 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_date"]', function() {
+        console.log('p_date change handler!');
+
+        setDateBySelectChange();
+
+    });
+
+    // select 오늘 btn cklick
+    $(document).on('click', '#section_wrap .select_wrap input[name="p_today"]', function() {
+        console.log('p_today click handler!');
+
+        setDateByTodayBtnclick();
+
+    });
+
+    // .list_search input[name="search"] btn ckick
+    $(document).on('click', '#section_wrap .list_search input[name="search"]', function() {
+        console.log('search btn click handler!');
+
+        searchBtnClick();
+
+    })
+    
+    // .sales_detail_modal colse 버튼. 모달 hide 처리.
+    $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .close_box').click(function() {
+        console.log('modal close btn click!');
+
+        $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal_wrap').hide();
+
+        removeDetailModal();
+
+    })
+
+}
+
+// select[name="p_year"] set 함수
+function setYearBySelectChange() {
+    console.log('setYearBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    // 변경된 year currentDAte 적용
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+                    
+	let fcs_no = $('#fc_no').text();
+    ajax_getCurrentDateMyStoreSalesInfo(fcs_no);	// 변경된 날짜 sales 정보 가져오기
+
+}
+
+// select[name="p_month"] set 함수
+function setMonthBySelectChange() {
+    console.log('setMonthBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+	
+ 	// 변경된 year currentDAte 적용
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    let fcs_no = $('#fc_no').text();
+    ajax_getCurrentDateMyStoreSalesInfo(fcs_no);	// 변경된 날짜 sales 정보 가져오기
+
+}
+
+//select[name="p_date"] set 함수
+function setDateBySelectChange() {
+    console.log('setDateBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+	
+ 	// 변경된 year currentDAte 적용
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    let fcs_no = $('#fc_no').text();       
+    ajax_getCurrentDateMyStoreSalesInfo(fcs_no); 	// 변경된 날짜 sales 정보 가져오기
+
+}
+
+// input[name="p_today"] 버튼 클릭 (오늘날짜)
+function setDateByTodayBtnclick() {
+    console.log('setDateByTodayBtnclick()');
+
+    // currentDAte 오늘 날짜로 세팅
+    setCurrentDate(today_year, today_month, today_date);
+	
+    // select 날짜들 오늘 날짜로 세팅
+    setCurrentYearAndMonthSelectUI()
+
+    let fcs_no = $('#fc_no').text();
+    ajax_getCurrentDateMyStoreSalesInfo(fcs_no);// 변경된 날짜 sales 정보 가져오기
+
+}
+
+
+function searchBtnClick() {
+    console.log('searchBtnClick()');
+
+    let fcs_no = $('#fc_no').text();
+    ajax_getMyStoreSalesInfoByInputPeriod(fcs_no);
+
+}
+
+function removeStoreSalesList() {
+    console.log('removeStoreSalesList()');
+
+    $('#section_wrap table tbody tr').remove();
+
+}
+
+function removePageNo() {
+    console.log('removePageNo()');
+
+    $('#section_wrap div.page_no_wrap').empty();
+
+}
+
+
+// .sales_detail_modal 내 정보 지우기
+function removeDetailModal() {
+    console.log('removeDetailModal()');
+
+    $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .store_info ul').empty();
+    $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .order_info table tbody').empty();
+    $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .price_info').empty();
+
+}
+
+
+// ajax - 우리가게 총 매출 불러오기 /* fcs_no = 로그인된 가게 no */ 
+function ajax_getMyStoreAllSalesInfo(fcs_no, pageNum = 1) {
+    console.log('ajax_getMyStoreAllSalesInfo()');
+    $.ajax({
+        url: '/franchisee/sales/getMyStoreAllSalesInfo',
+        method: 'get', 
+        data: { 
+        	'fcs_no' : fcs_no, 
+        	'page' : pageNum,
+       	},
+       	contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+            
+            removeStoreSalesList();
+            removePageNo()
+
+            let myStoreAllSalesInfoDto = data.myStoreAllSalesInfo;
+            let myStoreAllSalesInfoPageDto = data.myStoreAllSalesPageDtos;
+            let storeTotalSalesPrice = data.totalsalesDto;
+            let appendTag = '';
+			
+            for (let i = 0; i < myStoreAllSalesInfoDto.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + myStoreAllSalesInfoDto[i].fcsa_no + '</td>';
+                    appendTag += '<td><a class="ori_no" href="#none">' + myStoreAllSalesInfoDto[i].fco_ori_no + '</a></td>';
+                    appendTag += '<td>' + myStoreAllSalesInfoDto[i].fcsa_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + myStoreAllSalesInfoDto[i].pm_type + '</td>';
+                    appendTag += '<td>' + myStoreAllSalesInfoDto[i].fcsa_reg_date + '</td>';
+                    appendTag += '<td>' + myStoreAllSalesInfoDto[i].fcsa_mod_date + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (myStoreAllSalesInfoPageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(myStoreAllSalesInfoPageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = myStoreAllSalesInfoPageDto.startPage; i <= myStoreAllSalesInfoPageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === myStoreAllSalesInfoPageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(myStoreAllSalesInfoPageDto.page >= myStoreAllSalesInfoPageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreAllSalesInfoPageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreAllSalesInfoPageDto.maxPage)}'>&#8811;</a>`);
+            }
+            
+            if(storeTotalSalesPrice !== null) {
+            	$('#section_wrap .list_total_sales_price span.total_price').text(storeTotalSalesPrice.sum_total_price.toLocaleString("ko-KR"));
+            } else {
+            	$('#section_wrap .list_total_sales_price span.total_price').text('0');
+            }
+        	
+            
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+            
+
+        }, 
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getMyStoreAllSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getMyStoreAllSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getMyStoreAllSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap .franchisee_sales_list table a.ori_no').click(function(){
+            	console.log('a.ori_no click');
+            	
+            	let fco_ori_no = $(this).text();
+            	
+            	ajax_salesDetailInfo(fco_ori_no);
+            	
+            	$('#section_wrap .franchisee_section_view_wrap .sales_detail_modal_wrap').css('display', 'block');
+            	
+            })
+            
+
+            
+
+        }
+
+    })
+
+}
+
+/* 우리 가게의 선택 날짜(하루)의 매출 불러오기 */
+ 
+function ajax_getCurrentDateMyStoreSalesInfo(fcs_no, pageNum = 1) {
+    console.log('ajax_getCurrentDateMyStoreSalesInfo');
+    
+    let currentDate = {
+   		year: current_year,
+   	    month: current_month,
+        date: current_date,
+        page: pageNum,
+        fcs_no : fcs_no
+    }
+    
+    $.ajax({
+        url: '/franchisee/sales/getCurrentDateMyStoreSalesInfo',
+        method: 'post', 
+        data: JSON.stringify(currentDate),
+       	contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+            
+            removeStoreSalesList();
+            removePageNo()
+
+            let myStoreSalesDtosBySelectDate = data.myStoreSalesDtosBySelectDate;
+            let myStoreSalesInfoBySelectDatePageNum = data.myStoreSalesInfoBySelectDatePageNum;
+            let currentDateTotalsalesDto = data.currentDateTotalsalesDto;
+            let appendTag = '';
+            
+            for (let i = 0; i < myStoreSalesDtosBySelectDate.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + myStoreSalesDtosBySelectDate[i].fcsa_no + '</td>';
+                    appendTag += '<td><a class="ori_no" href="#none">' + myStoreSalesDtosBySelectDate[i].fco_ori_no + '</a></td>';
+                    appendTag += '<td>' + myStoreSalesDtosBySelectDate[i].fcsa_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosBySelectDate[i].pm_type + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosBySelectDate[i].fcsa_reg_date + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosBySelectDate[i].fcsa_mod_date + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (myStoreSalesInfoBySelectDatePageNum.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(myStoreSalesInfoBySelectDatePageNum.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = myStoreSalesInfoBySelectDatePageNum.startPage; i <= myStoreSalesInfoBySelectDatePageNum.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === myStoreSalesInfoBySelectDatePageNum.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(myStoreSalesInfoBySelectDatePageNum.page >= myStoreSalesInfoBySelectDatePageNum.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreSalesInfoBySelectDatePageNum.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreSalesInfoBySelectDatePageNum.maxPage)}'>&#8811;</a>`);
+            }
+            
+            if(currentDateTotalsalesDto !== null) {
+            	$('#section_wrap .list_total_sales_price span.total_price').text(currentDateTotalsalesDto.sum_total_price.toLocaleString("ko-KR"));
+            } else {
+            	$('#section_wrap .list_total_sales_price span.total_price').text('0');
+            }
+            
+            
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        }, 
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getCurrentDateMyStoreSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getCurrentDateMyStoreSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getCurrentDateMyStoreSalesInfo(fcs_no, this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap .franchisee_sales_list table a.ori_no').click(function(){
+            	console.log('a.ori_no click');
+            	
+            	let fco_ori_no = $(this).text();
+            	
+            	ajax_salesDetailInfo(fco_ori_no);
+            	
+            	$('#section_wrap .franchisee_section_view_wrap .sales_detail_modal_wrap').css('display', 'block');
+            	
+            })
+
+        }
+
+    })
+
+}
+
+// 우리가게 기간별 매출 불러오기 (달력버튼으로 언제부터 언제까지 인지 지정해서 검색하는 부분)
+function ajax_getMyStoreSalesInfoByInputPeriod(fcs_no, pageNum = 1) {
+	console.log('ajax_getMyStoreSalesInfoByInputPeriod');
+    
+	   let startDate = $('input[name="start_date"]').val();
+	   let endDate = $('input[name="end_date"]').val();
+	   let period = {
+	        startDate: startDate,
+	        endDate: endDate, 
+       	 	page: pageNum,
+        	fcs_no : fcs_no
+    	}	
+    
+    $.ajax({
+        url: '/franchisee/sales/getMyStoreSalesInfoByInputPeriod',
+        method: 'post', 
+        data: JSON.stringify(period),
+       	contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+            
+            removeStoreSalesList();
+            removePageNo()
+
+            let myStoreSalesDtosByInputPeriod = data.myStoreSalesDtosByInputPeriod;
+            let myStoreSalesInfoByInputPeriodPageNum = data.myStoreSalesInfoByInputPeriodPageNum;
+            let periodDateTotalSalesDto = data.periodDateTotalSalesDto;
+            let appendTag = '';
+            
+            console.log(myStoreSalesDtosByInputPeriod);
+            console.log(myStoreSalesInfoByInputPeriodPageNum);
+            
+			
+            for (let i = 0; i < myStoreSalesDtosByInputPeriod.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + myStoreSalesDtosByInputPeriod[i].fcsa_no + '</td>';
+                    appendTag += '<td><a class="ori_no" href="#none">' + myStoreSalesDtosByInputPeriod[i].fco_ori_no + '</a></td>';
+                    appendTag += '<td>' + myStoreSalesDtosByInputPeriod[i].fcsa_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosByInputPeriod[i].pm_type + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosByInputPeriod[i].fcsa_reg_date + '</td>';
+                    appendTag += '<td>' + myStoreSalesDtosByInputPeriod[i].fcsa_mod_date + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (myStoreSalesInfoByInputPeriodPageNum.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(myStoreSalesInfoByInputPeriodPageNum.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = myStoreSalesInfoByInputPeriodPageNum.startPage; i <= myStoreSalesInfoByInputPeriodPageNum.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === myStoreSalesInfoByInputPeriodPageNum.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(myStoreSalesInfoByInputPeriodPageNum.page >= myStoreSalesInfoByInputPeriodPageNum.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreSalesInfoByInputPeriodPageNum.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(myStoreSalesInfoByInputPeriodPageNum.maxPage)}'>&#8811;</a>`);
+            }
+            
+            if(periodDateTotalSalesDto !== null) {
+            	$('#section_wrap .list_total_sales_price span.total_price').text(periodDateTotalSalesDto.sum_total_price.toLocaleString("ko-KR"));
+            } else {
+            	$('#section_wrap .list_total_sales_price span.total_price').text('0');
+            }
+            
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        }, 
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getMyStoreSalesInfoByInputPeriod(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getMyStoreSalesInfoByInputPeriod(fcs_no, this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getMyStoreSalesInfoByInputPeriod(fcs_no, this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap .franchisee_sales_list table a.ori_no').click(function(){
+            	console.log('a.ori_no click');
+            	
+            	let fco_ori_no = $(this).text();
+            	
+            	ajax_salesDetailInfo(fco_ori_no);
+            	
+            	$('#section_wrap .franchisee_section_view_wrap .sales_detail_modal_wrap').css('display', 'block');
+            	
+            })
+
+        }
+
+    })
+	
+}
+
+// 주문번호 클릭 시 상세 오더 모달
+function ajax_salesDetailInfo(fco_ori_no) {
+    console.log("ajax_salesDetailInfo()");
+
+    $.ajax({
+        url: '/admin/sales/getSalesDetailInfo',
+        method: 'post',
+        data: {'fco_ori_no' : fco_ori_no},
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!')
+
+            removeDetailModal();
+
+            let salesDetailInfo = data.salesDetailInfo;
+            console.log("salesDetailInfo--", salesDetailInfo);
+            let appendTag = '';
+
+            appendTag += '<li> 지점명 : ' + salesDetailInfo[0].fcs_name + '</li>';
+            appendTag += '<li> 대표자 : ' + salesDetailInfo[0].fcm_name + '</li>';
+            appendTag += '<li> 주소 : ' + salesDetailInfo[0].fcs_location + '</li>';
+            appendTag += '<li> 연락처 : ' + salesDetailInfo[0].fcs_phone + '</li>';
+            appendTag += '<li> 결제수단 : ' + salesDetailInfo[0].pm_type + '</li>';
+            appendTag += '<li> 결제일 : ' + salesDetailInfo[0].fcsa_reg_date + '</li>';
+
+            $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .store_info ul').append(appendTag);
+
+            for (let i = 0; i < salesDetailInfo.length; i++) {
+
+                let appendTbodyTag = '';
+                
+                appendTbodyTag += '<tr>'
+                    appendTbodyTag += '<td class="menu_name" colspan="4">' + salesDetailInfo[i].fc_menu_name + ' - ' + salesDetailInfo[i].fco_menu_option + '</td>'
+                appendTbodyTag += '</tr>'
+                
+                appendTbodyTag += '<tr>'
+                    appendTbodyTag += '<td></td>'
+               		appendTbodyTag += '<td>' + (parseInt(salesDetailInfo[i].fco_menu_option_price+salesDetailInfo[i].fc_menu_price)).toLocaleString("ko-KR") + '</td>'
+               		appendTbodyTag += '<td>' + salesDetailInfo[i].fco_menu_cnt + '</td>'
+                	appendTbodyTag += '<td>' + (parseInt((salesDetailInfo[i].fco_menu_option_price+salesDetailInfo[i].fc_menu_price)*salesDetailInfo[i].fco_menu_cnt)).toLocaleString("ko-KR")  + '</td>'
+                appendTbodyTag += '</tr>'
+                
+
+                $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .order_info table tbody').append(appendTbodyTag);
+
+            }
+
+            let appendPriceTag = '';
+
+            appendPriceTag += '<p>판매금액</p><p>' + salesDetailInfo[0].fcsa_price.toLocaleString("ko-KR") + ' 원</p>';
+
+            $('#section_wrap .franchisee_section_view_wrap .sales_detail_modal .price_info').append(appendPriceTag);
+
+        },
+        error: function(data) {
+            console.log('ajax error!')
+
+        }
+
+    })
+
+}
+
+
+
+
+</script>

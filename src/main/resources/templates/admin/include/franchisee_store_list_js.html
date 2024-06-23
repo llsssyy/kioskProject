@@ -1,0 +1,169 @@
+<script type="text/javascript" th:fragment="franchisee_store_list_js">
+
+
+$(document).ready(function(){
+    console.log('DOCUMENT READY!!')
+
+    addFranchiseeStoreListTable();
+
+});
+
+function addFranchiseeStoreListTable() {
+    console.log('addFranchiseeStoreListTable()');
+
+    ajax_getAllFranchiseeStoreInfo();
+
+}
+
+function removeFranchiseeStoreList() {
+    console.log('removeFranchiseeStoreList()');
+    $('#section_wrap table tbody tr').remove();
+
+}
+function removePageNo() {
+    console.log('removePageNo()');
+    $('#section_wrap div.page_no_wrap').empty();
+}
+
+// ajax - 모든 가맹점 목록 불러오기 
+function ajax_getAllFranchiseeStoreInfo(pageNum = 1) {
+    console.log('ajax_getAllFranchiseeStoreInfo');
+
+    $.ajax({
+        url: '/admin/member/getAllFranchiseeStoreInfo', 
+        method: 'get', 
+        data: 'page='+pageNum,
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+
+            let storeDtos = data.franchiseeStoreDtos;
+            let storeListPageDto = data.storeListPageDto;
+            let appendTag = '';
+            
+            removeFranchiseeStoreList();
+            removePageNo();
+			
+            for (let i = 0; i < storeDtos.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + storeDtos[i].fcs_no + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcs_name + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcs_location + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcs_phone + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcm_id + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcm_phone + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcs_reg_date + '</td>';
+                    appendTag += '<td>' + storeDtos[i].fcs_mod_date + '</td>';
+                    appendTag += '<td><input type="button" value="폐점" name="deleteBtn" fcs_no='+ storeDtos[i].fcs_no +'></td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+            
+            if(storeListPageDto.page <= 1){
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            }else{            	
+                $('#section_wrap div.page_no_wrap').append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap').append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(storeListPageDto.page-1)}'>[이전]</a>`);
+            }
+                        
+            for(let i = storeListPageDto.startPage; i <= storeListPageDto.endPage; i++){
+                let appendPageNum = '';
+                appendPageNum += "<span class='page_num_wrap'>";
+                if(i === storeListPageDto.page){
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                }else{
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+            }
+            
+            if(storeListPageDto.page >= storeListPageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap').append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(storeListPageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap').append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(storeListPageDto.maxPage)}'>&#8811;</a>`);
+            }
+
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        },
+        complete: function(){
+        	console.log('ajax complete!!');
+        	
+        	$('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+            	console.log('nextPageBtnClick()')
+            	
+            	ajax_getAllFranchiseeStoreInfo(this.getAttribute('page_num'));
+            });
+        	
+        	$('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+            	console.log('prePageBtnClick()')
+            	
+            	ajax_getAllFranchiseeStoreInfo(this.getAttribute('page_num'));
+            });
+        	
+        	$('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+            	console.log('pageNumBtnClick()')
+            	
+            	ajax_getAllFranchiseeStoreInfo(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap table tbody td input[name="deleteBtn"').click(function(){
+                console.log('fcs_no delete btn click')
+
+                let fcs_no = $(this).attr("fcs_no");
+
+                let result = confirm('가맹점을 삭제하시겠습니까?');
+
+                if(result) {
+                    ajax_franchiseeStoreDelete(fcs_no)
+
+                }
+
+            })
+        	
+        }
+
+    })
+
+}
+
+function ajax_franchiseeStoreDelete(fcs_no){
+    console.log('ajax_franchiseeStoreDelete()');
+
+    $.ajax({
+        url: '/admin/member/franchiseeStoreDelete',
+        method: 'post',
+        data: { 'fcs_no' : fcs_no  },
+        success: function(data){
+            console.log('ajax success')
+
+            alert("삭제 완료");
+
+        },
+        error: function(data){
+            console.log('ajax error')
+        },
+        complete: function() {
+
+            ajax_getAllFranchiseeStoreInfo(1);
+
+        }
+    })
+
+}
+
+</script>

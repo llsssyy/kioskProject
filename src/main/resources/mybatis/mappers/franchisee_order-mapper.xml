@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="com.office.kiosk.franchisee.order.IFranchiseeOrderDao">
+ 
+ <!-- 	<select id="getOrdersByNo" resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto">
+   		   	
+		SELECT FO.*, FS.*, FM.*, FMC.* 
+		
+	    FROM TBL_FC_ORDER FO 
+	    
+	    JOIN TBL_FC_STORE FS ON FO.FCS_NO = FS.FCS_NO 
+	    
+	    JOIN TBL_FC_MENU FM ON FO.FC_MENU_NO = FM.FC_MENU_NO 
+	    
+	    JOIN TBL_FC_MENU_CATEGORY FMC ON FO.FCMC_NO = FMC.FCMC_NO 
+	    
+	    JOIN TBL_FC_MEMBER FM2 ON FS.FCM_NO = FM2.FCM_NO 
+	    
+	    WHERE FM2.FCM_NO = #{loginNo}
+		   		    		   
+  	</select>  -->
+  	
+  	<select id="selectOrderPagingList" resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto">
+  	 	
+  		SELECT FO.*, FS.*, FM.*, FMC.* 
+		
+	    FROM TBL_FC_ORDER FO 
+	    
+	    JOIN TBL_FC_STORE FS ON FO.FCS_NO = FS.FCS_NO 
+	    
+	    JOIN TBL_FC_MENU FM ON FO.FC_MENU_NO = FM.FC_MENU_NO 
+	    
+	    JOIN TBL_FC_MENU_CATEGORY FMC ON FO.FCMC_NO = FMC.FCMC_NO 
+	    
+	    JOIN TBL_FC_MEMBER FME ON FS.FCM_NO = FME.FCM_NO 
+	    
+	    WHERE FS.FCS_NO = #{loginNo} AND FO.FCSA_COMPLETE = 0 
+
+	    ORDER BY FCO_NO DESC 
+	    
+		LIMIT #{pagingParams.start}, #{pagingParams.limit}
+  		
+  	</select>
+  	
+  	<select id="selectAllOrderListCnt" resultType="Integer">
+  	
+  		SELECT COUNT(FO.FCS_NO) 
+  		
+		FROM TBL_FC_ORDER FO
+		
+		JOIN TBL_FC_STORE FS ON FO.FCS_NO = FS.FCS_NO
+		
+		WHERE FS.FCS_NO = #{loginNo} AND FO.FCSA_COMPLETE = 0 
+	
+  	</select>
+  	
+	<select id="selectAllCategory" parameterType="int"
+		resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto">
+
+		SELECT * FROM TBL_FC_MENU_CATEGORY
+
+	</select>
+	
+	<select id="selectAllMenu" parameterType="int"
+		resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto"> 
+		
+		SELECT * FROM TBL_FC_MENU WHERE FCMC_NO = #{fcmc_no}
+
+	</select>
+	
+	<select id="selectAllPrice" parameterType="int"
+		resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto"> 
+		
+		SELECT * FROM TBL_FC_MENU WHERE FC_MENU_NO = #{fc_menu_no}
+
+	</select>
+
+	<insert id="insertAllOrder" 
+			parameterType="com.office.kiosk.franchisee.order.FranchiseeOrderDto"> 
+			
+		INSERT INTO 
+			TBL_FC_ORDER(FCO_ORI_NO, 
+						FCO_PACKAGING, 
+						FCMC_NO, 
+						FC_MENU_NO, 
+						FCO_MENU_CNT, 
+						FCO_MENU_OPTION, 
+						FCO_MENU_OPTION_PRICE, 
+						FCO_TOTAL_PRICE, 
+						FCS_NO, 
+						PM_TYPE, 
+						FCO_REG_DATE, 
+						FCO_MOD_DATE)
+						
+		VALUES(#{fco_ori_no},  
+				#{fco_packaging}, 
+				#{fcmc_no}, 
+				#{fc_menu_no}, 
+				#{fco_menu_cnt}, 
+				#{fco_menu_option}, 
+				#{fco_menu_option_price}, 
+				#{fco_total_price}, 
+				#{fcs_no}, 
+				#{pm_type}, 
+				NOW(), NOW())
+		
+	</insert> 
+	
+	<select id="getOriNo" 
+			resultType="com.office.kiosk.franchisee.order.FranchiseeOrderDto">
+		
+		SELECT FCO_NO FROM TBL_FC_ORDER ORDER BY FCO_NO DESC LIMIT 1
+	
+	</select>
+	
+	<select id="selectOrderTotalPriceByOriNo"
+			parameterType="int"
+			resultType="com.office.kiosk.franchisee.sales.FranchiseeSalesDto">
+	
+		SELECT
+			SUM(FCO_TOTAL_PRICE) AS FCSA_PRICE 
+		FROM 
+			TBL_FC_ORDER 
+		WHERE 
+			FCO_ORI_NO = #{fco_ori_no};
+			
+	</select>
+	
+	<insert id="insertSalesByOrder"
+			parameterType="com.office.kiosk.franchisee.sales.FranchiseeSalesDto">
+	
+		INSERT INTO 
+			TBL_FC_SALES(
+				FCO_ORI_NO,
+				FCSA_PRICE,
+				PM_TYPE,
+				FCS_NO,
+				FCSA_REG_DATE,
+				FCSA_MOD_DATE)
+		VALUES(
+			#{fco_ori_no},
+			#{fcsa_price},
+			#{pm_type},
+			#{fcs_no},
+			NOW(), NOW()) 
+	
+	</insert>
+	
+	<update id="updateOrderCompleteByOriNo" 
+			parameterType="int">
+	
+		UPDATE 
+			TBL_FC_ORDER 
+		SET 
+			FCSA_COMPLETE = 1
+		WHERE 
+			FCO_ORI_NO = #{fco_ori_no};
+	
+	</update>
+	
+	<update id="updateSalesCompleteByOriNo" 
+			parameterType="int">
+	
+		UPDATE 
+			TBL_FC_SALES  
+		SET 
+			FCSA_COMPLETE = 1
+		WHERE 
+			FCO_ORI_NO = #{fco_ori_no};
+			
+	</update>
+
+    
+</mapper>

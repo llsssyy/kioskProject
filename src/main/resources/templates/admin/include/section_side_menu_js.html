@@ -1,0 +1,18 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<script th:fragment="jquery_js">
+	
+		$(document).ready(function(){
+			$('#section_wrap .section_side_menu ul>li').mouseenter(function(){
+				$(this).children('ul').show();
+			})
+			
+			$('#section_wrap .section_side_menu ul>li').mouseleave(function(){
+				$(this).children('ul').hide();
+			})
+	
+		})
+	
+	</script>
+
+</html>

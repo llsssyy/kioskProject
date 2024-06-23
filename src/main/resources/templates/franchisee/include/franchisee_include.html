@@ -1,0 +1,45 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	
+	<header th:fragment="franchisee_header">
+	</header>
+	
+
+	<nav th:fragment="franchisee_nav">
+		<div id="nav_wrap" th:if="${session.loginedFranchiseeMemberDto == null}" >
+			<a th:href="@{/franchisee/home}">홈</a>
+			<a th:href="@{/franchisee/member/createFranchiseeAccountForm}">회원가입</a>
+			<a th:href="@{/franchisee/member/franchiseeLoginForm}">로그인</a>
+		</div>
+		
+		<div id="nav_wrap" th:unless="${session.loginedFranchiseeMemberDto == null}" >
+			<a th:href="@{/franchisee/home}">홈</a>
+			<a th:href="@{/franchisee/member/franchiseeModifyForm}">정보수정</a>
+			<a href="#none" th:onclick="franchiseeLogoutConfirm()">로그아웃</a>
+			<span hidden th:text="${session.loginedFranchiseeMemberDto.fcs_no}"></span>&nbsp;&nbsp;<span th:text="${session.loginedFranchiseeMemberDto.fcs_name}"></span>
+			<input type="button" value="변경" onclick="changeStoreBtn()">
+		</div> 
+	</nav>
+	
+
+	<div class="section_menu_wrap" th:fragment="section_menu_wrap">
+		
+	 	<ul>
+	 		<li><a th:href="@{/franchisee/sales/getSalesInfo}">매출조회</a></li>
+			<li><a th:href="@{/franchisee/menu/franchiseeMenuHome}">메뉴목록</a></li>
+			<li><a th:href="@{/franchisee/order/createOrderList}">주문하기</a></li>
+			<li><a th:href="@{/franchisee/order/getTableOrderList}">주문조회</a></li>
+		</ul>
+	
+			<!-- <li><a th:href="@{/franchisee/menu/createMenuForm}">추가 메뉴 신청</a></li>
+			<li><a th:href="@{/franchisee/menu/getAllMenus}">메뉴 목록</a></li>
+			<li><a th:href="@{/franchisee/menu/modifySelectMenu}">메뉴 수정</a></li> -->
+	</div>
+	
+	
+	<footer th:fragment="franchisee_footer">
+		<div id="footer_wrap">
+			<img src="/img/main/logo.PNG">
+		</div>
+	</footer>
+
+</html>

@@ -1,0 +1,821 @@
+<script type="text/javascript" th:fragment="admin_store_sales_list_js">
+
+// ------------ 현재 ------------
+let current_year;			// 현재_년도
+let current_month;			// 현재_월
+let current_date;			// 현재_일
+
+//------------ 오늘 ------------
+let today = new Date();
+let today_year 	= today.getFullYear();		// 오늘_년도
+let today_month = today.getMonth() + 1;			// 오늘_월
+let today_date 	= today.getDate();			// 오늘_일
+
+
+
+$(document).ready(function(){
+    console.log('DOCUMENT READY!!')
+
+    // 현재 날짜 세팅
+    setCurrentDate(today_year, today_month, today_date);
+
+    // select p_date 이달 날짜 입력
+    setCurrentDateSelectOption();
+
+    // select_wrap 현재 일자 세팅
+    setCurrentYearAndMonthSelectUI();
+
+    // input[type="date"] 기본 날짜 세팅
+    setCurrentDateSearchInput();
+
+    // 가맹점별 일 매출 테이블 <tr> 추가
+    addStoreSalesListTable();
+
+    // 이벤트 핸들러 초기화
+    initEvents();
+
+})
+
+function setCurrentDate(year, month, date) {
+	console.log('setCurrentDate()');
+
+	current_year 	= year;
+	current_month 	= month;
+	current_date 	= date;
+	
+}
+
+function setCurrentYearAndMonthSelectUI() {
+	console.log('setCurrentYearAndMonthSelectUI()');
+	
+	$('#section_wrap select[name="p_year"]').val(current_year).prop('selected', true);
+	$('#section_wrap select[name="p_month"]').val(current_month).prop('selected', true);
+	$('#section_wrap select[name="p_date"]').val(current_date).prop('selected', true);
+}
+
+// input[type="date"] 기본 날짜 세팅
+function setCurrentDateSearchInput() {
+    console.log('setCurrentDateSearchInput()');
+
+    let date = new Date();
+    let year = date.getFullYear();
+    let preMonth = ('0' + (date.getMonth())).slice(-2);
+    let month = ('0' + (date.getMonth() + 1)).slice(-2);
+    let day = ('0' + date.getDate()).slice(-2);
+    let preMonthDateStr = `${year}-${preMonth}-${day}`;
+    let dateStr = `${year}-${month}-${day}`;
+
+    // 한달전 날짜 세팅
+    $('#section_wrap .list_search input[name="start_date"]').val(preMonthDateStr);
+    // 현재 날짜 세팅
+    $('#section_wrap .list_search input[name="end_date"]').val(dateStr);
+
+}
+
+function setCurrentDateSelectOption() {
+    console.log('setCurrentDateSelectOption()');
+
+    // -----------------  현재 월 & 첫 날 -------------------
+    let thisDateStart			= new Date(current_year, current_month, 1);
+    let thisDateStart_year		= thisDateStart.getFullYear();			// 이번달_년
+    let thisDateStart_month		= thisDateStart.getMonth();				// 이번달_월
+    let thisDateStart_date		= thisDateStart.getDate();				// 이번달_일
+
+    // -----------------  현재 월 & 마지막 날 -----------------
+    let thisDateEnd				= new Date(current_year, current_month + 1, 0);
+    let thisDateEnd_year		= thisDateEnd.getFullYear();			// 이번달_년
+    let thisDateEnd_month		= thisDateEnd.getMonth();				// 이번달_월
+    let thisDateEnd_date		= thisDateEnd.getDate();				// 이번달_일
+
+    let appendTag = '';
+    console.log("thisDateEnd_date ---- " , thisDateEnd_date);
+
+    for (let i = 0; i < thisDateEnd_date; i++) {
+
+        appendTag = "<option value='" + parseInt(i+1) + "'>" + parseInt(i+1) + "</option>";
+
+        $('#section_wrap .select_wrap select[name="p_date"]').append(appendTag);
+
+    }
+
+}
+
+function addStoreSalesListTable() {
+    console.log('addStoreSalesListTable()');
+
+    ajax_getStoreAllSalesInfo()
+
+}
+
+
+function initEvents() {
+    console.log('initEvents()');
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_year"]', function() {
+        console.log('p_year change handler!');
+
+        setYearBySelectChange();
+
+    });
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_month"]', function() {
+        console.log('p_month change handler!');
+
+        setMonthBySelectChange();
+
+    });
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_date"]', function() {
+        console.log('p_date change handler!');
+
+        setDateBySelectChange();
+
+    });
+
+    // select 오늘 btn cklick
+    $(document).on('click', '#section_wrap .select_wrap input[name="p_today"]', function() {
+        console.log('p_today click handler!');
+
+        setDateByTodayBtnclick();
+
+    });
+
+    // .list_search input[name="search"] btn ckick
+    $(document).on('click', '#section_wrap .list_search input[name="search"]', function() {
+        console.log('search btn click handler!');
+
+        searchBtnClick();
+
+    })
+
+}
+
+function setYearBySelectChange() {
+    console.log('setYearBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateTotalSales();
+
+}
+
+function setMonthBySelectChange() {
+    console.log('setMonthBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateTotalSales();
+
+}
+
+function setDateBySelectChange() {
+    console.log('setDateBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateTotalSales();
+
+}
+
+function setDateByTodayBtnclick() {
+    console.log('setDateByTodayBtnclick()');
+
+    setCurrentDate(today_year, today_month, today_date);
+
+    setCurrentYearAndMonthSelectUI()
+
+    ajax_getCurrentDateTotalSales();
+
+}
+
+function searchBtnClick() {
+    console.log('searchBtnClick()');
+
+    ajax_getStoreTotalSalesByInputPeriod();
+
+}
+
+function removeStoreSalesList() {
+    console.log('removeStoreSalesList()');
+
+    $('#section_wrap table tbody tr').remove();
+
+}
+
+function removePageNo() {
+    console.log('removePageNo');
+
+    $('#section_wrap div.page_no_wrap').empty();
+
+}
+
+function removeChart(){
+	console.log('removeChart()');
+	
+	$('#myChart').remove();
+	$('.chart').append('<canvas id="myChart"></canvas>');
+	
+}
+
+function removeModalChart(){
+	console.log('removeChart()');
+	
+	$('#storeChart').remove();
+	$('.modal_chart').append('<canvas id="storeChart"></canvas>');
+	
+}
+
+function addChart(fcs_name_arr, card_price_arr, cash_price_arr) {
+	console.log('addChart()')
+	
+	removeChart();
+    
+    var context = document
+        .getElementById('myChart')
+        .getContext('2d');
+    var myChart = new Chart(context, {
+        type: 'bar', // 차트의 형태
+        data: { // 차트에 들어갈 데이터
+            labels: fcs_name_arr, //x 축
+            datasets: [
+                { //데이터
+                    label: '카드', //차트 제목
+                    fill: false, // line 형태일 때, 선 안쪽을 채우는지 안채우는지
+                    data: card_price_arr //x축 label에 대응되는 데이터 값
+                    ,
+                    backgroundColor: 
+                        //색상
+                        'rgba(255, 99, 132, 0.2)'
+                    ,
+                    borderColor: 
+                        //경계선 색상
+                        'rgba(255, 99, 132, 1)'
+
+                    ,
+                    borderWidth: 1 //경계선 굵기
+                },
+                {
+                    label: '현금',
+                    fill: false,
+                    data: cash_price_arr,
+                    backgroundColor: 
+                        //색상
+                        'rgba(54, 162, 235, 0.2)'
+                    ,
+                    borderColor: 
+                        //경계선 색상
+                        'rgba(54, 162, 235, 1)'
+                    ,
+                    borderWidth: 1 //경계선 굵기
+                } 
+            ]
+        },
+        options: {
+            scales:  {
+                x: {
+                    stacked: true,
+                  },
+                  y: {
+                    stacked: true
+                  }
+            },
+            maxBarThickness: 50
+        }
+    });
+}
+
+// ajax - 가맹점 총 매출 불러오기 
+function ajax_getStoreAllSalesInfo(pageNum = 1) {
+    console.log('ajax_getStoreAllSalesInfo');
+
+    $.ajax({
+        url: '/admin/sales/getStoreAllSalesInfo', 
+        method: 'post', 
+        data: { 'page' : pageNum },
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+
+            removeStoreSalesList();
+            removePageNo()
+
+            let pageDto = data.allStoreSalesListPageDto;
+            let storeDtos = data.storeSalesDtos;
+            let appendTag = '';
+            
+            let fcs_name_arr = [];
+			let card_price_arr = [];
+			let cash_price_arr = [];
+			
+            for (let i = 0; i < storeDtos.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + storeDtos[i].fcs_no + '</td>';
+                    appendTag += '<td><a href="#none" fcs_no="'+storeDtos[i].fcs_no+'">' + storeDtos[i].fcs_name + '</a></td>';
+                    appendTag += '<td>' + storeDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + storeDtos[i].cash_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + storeDtos[i].card_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + (parseInt(storeDtos[i].card_total_price+storeDtos[i].cash_total_price)).toLocaleString("ko-KR") + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+                
+                fcs_name_arr.push(storeDtos[i].fcs_name);
+                card_price_arr.push(storeDtos[i].card_total_price);
+                cash_price_arr.push(storeDtos[i].cash_total_price);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+            
+            addChart(fcs_name_arr, card_price_arr, cash_price_arr);
+
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        }, 
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getStoreAllSalesInfo(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getStoreAllSalesInfo(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getStoreAllSalesInfo(this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap table tbody tr td:nth-child(2) a').click(function(){
+            	console.log('지점 버튼 클릭');
+            	
+            	let fcs_no = $(this).attr("fcs_no");
+            	let fcs_name = $(this).text();
+            	
+            	ajax_storeMonthlySalesChart(fcs_no, fcs_name);
+            	
+            });
+
+        }
+
+    })
+
+}
+
+// ajax - current date total sales 목록 가져오기 
+function ajax_getCurrentDateTotalSales(pageNum = 1) {
+    console.log('ajax_getCurrentDateTotalSales()');
+
+    let currentDate = {
+        year: current_year,
+        month: current_month,
+        date: current_date, 
+        page: pageNum
+    }
+
+    $.ajax({
+        url: '/admin/sales/getSelectDateSalesInfo',
+        method: 'post',
+        data: JSON.stringify(currentDate),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!');
+
+            removeStoreSalesList();
+            removePageNo();
+
+            let pageDto = data.StoreSalesListPageDtoBySelectDate;
+            let selectDtos = data.selectSalesDtosBySelectDate;
+            let appendTag = '';
+            
+            let fcs_name_arr = [];
+			let card_price_arr = [];
+			let cash_price_arr = [];
+
+            
+            for (let i = 0; i < selectDtos.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + selectDtos[i].fcs_no + '</td>';
+                    appendTag += '<td><a href="#none" fcs_no="'+selectDtos[i].fcs_no+'">' + selectDtos[i].fcs_name + '</a></td>';
+                    appendTag += '<td>' + selectDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + selectDtos[i].cash_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + selectDtos[i].card_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + (parseInt(selectDtos[i].card_total_price+selectDtos[i].cash_total_price)).toLocaleString("ko-KR") + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+                
+                fcs_name_arr.push(selectDtos[i].fcs_name);
+                card_price_arr.push(selectDtos[i].card_total_price);
+                cash_price_arr.push(selectDtos[i].cash_total_price);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+            
+            addChart(fcs_name_arr, card_price_arr, cash_price_arr);
+
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        },
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getCurrentDateTotalSales(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getCurrentDateTotalSales(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getCurrentDateTotalSales(this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap table tbody tr td:nth-child(2) a').click(function(){
+            	console.log('지점 버튼 클릭');
+            	
+            	let fcs_no = $(this).attr("fcs_no");
+            	let fcs_name = $(this).text();
+            	
+            	ajax_storeMonthlySalesChart(fcs_no, fcs_name);
+            	
+            });
+
+        }
+
+    })
+
+}
+
+
+// 하단 선택 기간 가맹점별 매출 불러오기
+function ajax_getStoreTotalSalesByInputPeriod(pageNum = 1) {
+    console.log('ajax_getStoreTotalSalesByInputPeriod()');
+
+    let startDate = $('input[name="start_date"]').val();
+    let endDate = $('input[name="end_date"]').val();
+    let period = {
+        startDate: startDate,
+        endDate: endDate,
+        page: pageNum
+    }
+
+    $.ajax({
+        url: '/admin/sales/getStoreTotalSalesByInputPeriod',
+        method: 'post',
+        data: JSON.stringify(period),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!')
+
+            removeStoreSalesList();
+            removePageNo();
+
+            let pageDto = data.storeSalesListPageDtoByInputPeriod;
+            let selectDtos = data.sotreSalesDtosByInputPeriod;
+            let appendTag = '';
+            
+            let fcs_name_arr = [];
+			let card_price_arr = [];
+			let cash_price_arr = [];
+            
+            for (let i = 0; i < selectDtos.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + selectDtos[i].fcs_no + '</td>';
+                    appendTag += '<td><a href="#none" fcs_no="'+selectDtos[i].fcs_no+'">' + selectDtos[i].fcs_name + '</a></td>';
+                    appendTag += '<td>' + selectDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + selectDtos[i].cash_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + selectDtos[i].card_total_price.toLocaleString("ko-KR") + '</td>';
+                    appendTag += '<td>' + (parseInt(selectDtos[i].card_total_price+selectDtos[i].cash_total_price)).toLocaleString("ko-KR") + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+                
+                fcs_name_arr.push(selectDtos[i].fcs_name);
+                card_price_arr.push(selectDtos[i].card_total_price);
+                cash_price_arr.push(selectDtos[i].cash_total_price);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+            
+            addChart(fcs_name_arr, card_price_arr, cash_price_arr);
+
+        },
+        error: function(data) {
+            console.log('ajax error!')
+
+        },
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getStoreTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getStoreTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getStoreTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+            
+            $('#section_wrap table tbody tr td:nth-child(2) a').click(function(){
+            	console.log('지점 버튼 클릭');
+            	
+            	let fcs_no = $(this).attr("fcs_no");
+            	let fcs_name = $(this).text();
+            	
+            	ajax_storeMonthlySalesChart(fcs_no, fcs_name);
+            	
+            });
+
+        }
+    })
+
+}
+
+// 선택 지점 월별 매출 그래프 모달 불러오기
+function ajax_storeMonthlySalesChart(fcs_no, fcs_name){
+	console.log('ajax_storeMonthlySalesChart()');
+	
+	$.ajax({
+        url: '/admin/sales/getStoreMonthlySales',
+        method: 'post',
+        data: { "fcs_no" : fcs_no },
+        dataType: 'json',
+        success: function(data) {
+        	console.log('ajax_storeMonthlySalesChart success')
+        	
+        	let storeMonthlySalesDtos = data.storeMonthlySalesDtos;
+        	
+        	let dateArr = [];
+        	let totalPrice = [];
+        	
+        	for (let i = 0; i < storeMonthlySalesDtos.length; i++) {
+        		
+        		let date = '';
+        		
+        		date += storeMonthlySalesDtos[i].year;
+        		date += '.';
+        		date += storeMonthlySalesDtos[i].month;
+        		
+        		dateArr.push(date);
+        		
+        		totalPrice.push(storeMonthlySalesDtos[i].sum_total_price);
+        		
+        	}
+        	
+        	$('#section_wrap .admin_section_view_wrap .store_sales_modal_wrap').show();
+        	
+        	$('#section_wrap .admin_section_view_wrap .store_sales_modal_wrap .store_sales_modal .modal_txt p').text(fcs_name);
+        	
+        	removeModalChart();
+        	
+            var context = document
+	            .getElementById('storeChart')
+	            .getContext('2d');
+	        var myChart = new Chart(context, {
+	            type: 'line', // 차트의 형태
+	            data: { // 차트에 들어갈 데이터
+	                labels: dateArr, //x 축
+	                datasets: [
+	                    { //데이터
+	                        label: '월 매출', //차트 제목
+	                        fill: false, // line 형태일 때, 선 안쪽을 채우는지 안채우는지
+	                        data: totalPrice //x축 label에 대응되는 데이터 값
+	                        ,
+	                        backgroundColor: 
+	                            //색상
+	                            'rgba(153, 102, 255, 0.2)'
+	                        ,
+	                        borderColor: 
+	                            //경계선 색상
+	                            'rgba(153, 102, 255, 1)'
+	
+	                        ,
+	                        borderWidth: 1 //경계선 굵기
+	                    }
+	                ]
+	            },
+	            options: {
+	            	response: true,
+	                scales:  {
+	                    x: {
+	                    	display: true,
+	                        title: {
+	                          display: true,
+	                          color: '#911',
+	                          font: {
+	                            family: 'Comic Sans MS',
+	                            size: 20,
+	                            weight: 'bold',
+	                            lineHeight: 1.2,
+	                          },
+	                          padding: {top: 20, left: 0, right: 0, bottom: 0}
+	                        }
+	                      },
+	                      y: {
+	                    	  display: true,
+	                          title: {
+	                            display: true,
+	                            color: '#191',
+	                            font: {
+	                              family: 'Times',
+	                              size: 20,
+	                              style: 'normal',
+	                              lineHeight: 1.2
+	                            },
+	                            padding: {top: 30, left: 0, right: 0, bottom: 0}
+	                      }
+	                	}
+	                }
+	            }
+	        });
+        	
+        },
+        error: function(data) {
+        	console.log('ajax_storeMonthlySalesChart error')
+        	
+        }, 
+        complete: function(data) {
+        	console.log('ajax_storeMonthlySalesChart complete')
+        	
+        	$('#section_wrap .admin_section_view_wrap .store_sales_modal_wrap').click(function(){
+        		
+        		$('#section_wrap .admin_section_view_wrap .store_sales_modal_wrap').hide();
+        		
+        	});
+        	
+        }
+	})
+	
+}
+
+</script>

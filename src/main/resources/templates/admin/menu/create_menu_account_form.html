@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title th:replace="~{include/include_title.html::title}"></title>
+
+<script type="text/javascript" th:src="@{/js/admin/member/admin_member.js}"></script>
+
+<link rel="stylesheet" th:href="@{/css/admin/common.css}">
+<link rel="stylesheet" th:href="@{/css/admin/admin_include.css}">
+<link rel="stylesheet" th:href="@{/css/admin/admin_home.css}">
+<link rel="stylesheet" th:href="@{/css/admin/menu/admin_create_menu.css}">
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<script type="text/javascript" th:replace="~{admin/include/section_side_menu_js.html::jquery_js}"></script>
+
+<script type="text/javascript" th:src="@{/js/admin/menu/create_menu_account_form.js}"></script>
+<script th:replace="~{/include/create_menu_category_js.html::js}" type="text/javascript"></script>
+
+</head>
+<body>
+
+	<div id="admin_wrap">
+
+		<header th:replace="~{admin/include/admin_include.html::admin_header}">
+		</header>
+
+		<nav th:replace="~{admin/include/admin_include.html::admin_nav}">
+		</nav>
+
+		<section>
+			<div id="section_wrap">
+
+				<div th:replace="~{admin/include/admin_include.html::admin_section_side_menu}"></div>
+
+				<div class="admin_section_view_wrap" th:if="${session.loginedAdminMemberDto != null}">
+
+					<div class="word">신규 메뉴 생성</div>
+
+					<div class="create_menu_category_form">
+						<h3>신규 카테고리 등록</h3>
+						<form th:action="@{/admin/menu/createMenuCategoryAccountConfirm}" name="create_menu_category_account_form" method="post">							
+							<input type="text" name="fcmc_name"	placeholder="카테고리의 이름을 입력하세요."> 
+							<input type="button" value="등록" onclick="createMenuCategoryAccountForm()">
+						</form>
+						
+					</div>
+
+					<div class="create_menu_form">
+					
+						<h3>신규 메뉴 등록</h3>
+
+						<form th:action="@{/admin/menu/createMenuAccountConfirm}" name="create_menu_account_form" method="post" enctype="multipart/form-data">
+
+							<div class="input_create_menu_wrap">
+								<table>
+									<tr>
+										<td><span>카테고리 선택</span></td>
+										<td><select name="fcmc_no"></select></td>
+									</tr>
+									<tr>
+										<td><span>메 뉴 명</span></td>
+										<td><input type="text" name="fc_menu_name" class="basic_txt_input" placeholder="메뉴의 이름을 입력하세요."></td>
+									</tr>
+									<tr>
+										<td><span>메뉴 가격</span></td>
+										<td><input type="number" name="fc_menu_price" class="basic_txt_input"	placeholder="메뉴의 가격을 입력하세요."></td>
+									</tr>
+									<tr>
+										<td><span>메뉴 설명</span></td>
+										<td>
+											<textarea name="fc_menu_text" id="" cols="30" rows="10" class="long_txt_input"></textarea>
+										</td>										
+									</tr>									
+									<tr>
+										<td><span>메뉴 이미지 첨부</span></td>
+										<td><input type="file" name="file"></td>
+									</tr>
+									<tr>
+										<td colspan="2">
+											<input type="button" value="메뉴등록" onclick="createMenuAccountForm()">
+											<input type="reset" value="초기화" >											
+										</td>
+									</tr>
+								</table>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+				
+				<div class="admin_section_view_wrap" th:unless="${session.loginedAdminMemberDto != null}">
+
+					<div class="word">
+						신규 메뉴 생성.
+						<br>
+						로그인 후 이용 가능.
+						<br><br>
+						<a th:href="@{/admin/member/adminLoginForm}">로그인</a>
+					</div>
+
+				</div>
+
+			</div>
+		</section>
+
+		<footer th:replace="~{admin/include/admin_include.html::admin_footer}">
+		</footer>
+
+	</div>
+</body>
+</html>

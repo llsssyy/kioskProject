@@ -1,0 +1,27 @@
+/* customer header.css */        
+#header_wrap {
+	width: 100%;
+	height: 60px;
+	background: no-repeat center center url("/img/home/header_bg.jpg");
+	position: relative;
+	overflow: hidden;
+}
+#header_wrap ul.header_btn_wrap {
+	width: 150px;
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+}
+#header_wrap li.home_btn {
+	width: 30px;
+	height: 30px;
+	border-radius: 30px;
+	text-align: center;
+}
+#header_wrap li.home_btn img {
+	width: 80%;
+}
+#header_wrap li.home_btn:hover {
+	cursor: pointer;
+}
+        /* customer header.css END*/

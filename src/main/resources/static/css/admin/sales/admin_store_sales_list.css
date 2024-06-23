@@ -1,0 +1,89 @@
+#section_wrap .admin_section_view_wrap .select_wrap {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+#section_wrap .admin_section_view_wrap .select_wrap select {
+	padding: 5px;
+	text-align: center;
+}
+
+#section_wrap .admin_section_view_wrap .select_wrap input[name="p_today"] {
+	padding: 5px;
+}
+
+#section_wrap .admin_section_view_wrap .admin_store_sales_list {
+	width: 100%;
+}
+
+#section_wrap .admin_section_view_wrap .admin_store_sales_list .chart {
+	width: 600px;
+	margin: 0 auto;
+	margin-bottom: 20px;
+}
+
+#section_wrap .admin_section_view_wrap .admin_store_sales_list table {
+	margin: 0 10px;
+	border-collapse: collapse;
+	margin: 0 auto;
+}
+
+#section_wrap .admin_section_view_wrap .admin_store_sales_list table tr td {
+	border: 1px solid #000;
+	text-align: center;
+	font-size: .9em;
+	padding: 5px;
+}
+
+#section_wrap .admin_section_view_wrap .admin_store_sales_list table tbody a {
+	color: #152f89;
+	text-decoration: underline;
+}
+
+#section_wrap .admin_section_view_wrap .list_search {
+	margin: 20px 0;
+	text-align: center;
+}
+
+#section_wrap .admin_section_view_wrap .list_search input {
+	padding: 5px;
+}
+
+#section_wrap .admin_section_view_wrap div.page_no_wrap {
+	width: 250px;
+	text-align: center;
+	margin: 20px auto;
+	display: flex;
+	justify-content: space-between;
+}
+
+#section_wrap .admin_section_view_wrap .store_sales_modal_wrap {
+	width: 100%;
+	height: 100%;
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, .8);
+}
+
+#section_wrap .admin_section_view_wrap .store_sales_modal_wrap .store_sales_modal {
+	width: 600px;
+	height: 300px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	background-color: #fff;
+	padding-bottom: 20px;
+	padding-right: 40px;
+}
+
+#section_wrap .admin_section_view_wrap .store_sales_modal_wrap .store_sales_modal .modal_txt {
+	margin: 0 auto;
+	text-align: center;
+	font-size: 1.1em;
+	margin: 10px;
+}

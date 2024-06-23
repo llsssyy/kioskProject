@@ -1,0 +1,566 @@
+<script type="text/javascript" th:fragment="admin_franchisee_sales_list_js">
+
+// ------------ 현재 ------------
+let current_year;			// 현재_년도
+let current_month;			// 현재_월
+let current_date;			// 현재_일
+
+//------------ 오늘 ------------
+let today = new Date();
+let today_year 	= today.getFullYear();		// 오늘_년도
+let today_month = today.getMonth() + 1;		// 오늘_월
+let today_date 	= today.getDate();			// 오늘_일
+
+$(document).ready(function(){
+    console.log('DOCUMENT READY!!')
+
+    // 현재 날짜 세팅
+    setCurrentDate(today_year, today_month, today_date);
+
+    // select p_date 이달 날짜 입력
+    setCurrentDateSelectOption();
+
+    // select_wrap 현재 일자 세팅
+    setCurrentYearAndMonthSelectUI();
+
+    // input[type="date"] 기본 날짜 세팅
+    setCurrentDateSearchInput();
+
+    // 가맹점별 일 매출 테이블 <tr> 추가
+    addFranchiseeSalesListTable();
+
+    // 이벤트 핸들러 초기화
+    initEvents();
+
+})
+
+function setCurrentDate(year, month, date) {
+	console.log('setCurrentDate()');
+
+	current_year 	= year;
+	current_month 	= month;
+	current_date 	= date;
+	
+}
+
+// select_wrap 현재 일자 세팅
+function setCurrentYearAndMonthSelectUI() {
+	console.log('setCurrentYearAndMonthSelectUI()');
+	
+	$('#section_wrap select[name="p_year"]').val(current_year).prop('selected', true);
+	$('#section_wrap select[name="p_month"]').val(current_month).prop('selected', true);
+	$('#section_wrap select[name="p_date"]').val(current_date).prop('selected', true);
+
+}
+
+// input[type="date"] 기본 날짜 세팅
+function setCurrentDateSearchInput() {
+    console.log('setCurrentDateSearchInput()');
+
+    let date = new Date();
+    let year = date.getFullYear();
+    let preMonth = ('0' + (date.getMonth())).slice(-2);
+    let month = ('0' + (date.getMonth() + 1)).slice(-2);
+    let day = ('0' + date.getDate()).slice(-2);
+    let preMonthDateStr = `${year}-${preMonth}-${day}`;
+    let dateStr = `${year}-${month}-${day}`;
+
+    // 한달전 날짜 세팅
+    $('#section_wrap .list_search input[name="start_date"]').val(preMonthDateStr);
+    // 현재 날짜 세팅
+    $('#section_wrap .list_search input[name="end_date"]').val(dateStr);
+
+}
+
+// select_wrap 현재 일자 세팅
+function setCurrentDateSelectOption() {
+    console.log('setCurrentDateSelectOption()');
+
+    // -----------------  현재 월 & 첫 날 -------------------
+    let thisDateStart			= new Date(current_year, current_month, 1);
+    let thisDateStart_year		= thisDateStart.getFullYear();			// 이번달_년
+    let thisDateStart_month		= thisDateStart.getMonth();				// 이번달_월
+    let thisDateStart_date		= thisDateStart.getDate();				// 이번달_일
+
+    // -----------------  현재 월 & 마지막 날 -----------------
+    let thisDateEnd				= new Date(current_year, current_month + 1, 0);
+    let thisDateEnd_year		= thisDateEnd.getFullYear();			// 이번달_년
+    let thisDateEnd_month		= thisDateEnd.getMonth();				// 이번달_월
+    let thisDateEnd_date		= thisDateEnd.getDate();				// 이번달_일
+
+    let appendTag = '';
+    console.log("thisDateEnd_date ---- " , thisDateEnd_date);
+
+    // 현재 달 일수 만큼 select option 생성
+    for (let i = 0; i < thisDateEnd_date; i++) {
+
+        appendTag = "<option value='" + parseInt(i+1) + "'>" + parseInt(i+1) + "</option>";
+
+        $('#section_wrap .select_wrap select[name="p_date"]').append(appendTag);
+
+    }
+
+}
+
+function initEvents() {
+    console.log('initEvents()');
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_year"]', function() {
+        console.log('p_year change handler!');
+
+        setYearBySelectChange();
+
+    });
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_month"]', function() {
+        console.log('p_month change handler!');
+
+        setMonthBySelectChange();
+
+    });
+
+    // select 년도 변경 
+    $(document).on('change', '#section_wrap .select_wrap select[name="p_date"]', function() {
+        console.log('p_date change handler!');
+
+        setDateBySelectChange();
+
+    });
+
+    // select 오늘 btn cklick
+    $(document).on('click', '#section_wrap .select_wrap input[name="p_today"]', function() {
+        console.log('p_today click handler!');
+
+        setDateByTodayBtnclick();
+
+    });
+
+    // .list_search input[name="search"] btn ckick
+    $(document).on('click', '#section_wrap .list_search input[name="search"]', function() {
+        console.log('search btn click handler!');
+
+        searchBtnClick();
+
+    })
+
+
+}
+
+function addFranchiseeSalesListTable() {
+    console.log('addFranchiseeSalesListTable()');
+
+    ajax_getFranchiseeAllSalesInfo()
+
+}
+
+function setYearBySelectChange() {
+    console.log('setYearBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateFranchiseeTotalSales();
+
+}
+
+function setMonthBySelectChange() {
+    console.log('setMonthBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateFranchiseeTotalSales();
+
+}
+
+function setDateBySelectChange() {
+    console.log('setDateBySelectChange()');
+
+    let temp_year = $('select[name="p_year"]').val();
+	let temp_month = $('select[name="p_month"]').val();
+	let temp_date = $('select[name="p_date"]').val();
+
+    let selectedDate = new Date(temp_year, temp_month, temp_date);
+
+    setCurrentDate(selectedDate.getFullYear(), 
+                    selectedDate.getMonth(), 
+                    selectedDate.getDate(), 
+                    selectedDate.getDay())
+
+    ajax_getCurrentDateFranchiseeTotalSales();
+
+}
+
+function setDateByTodayBtnclick() {
+    console.log('setDateByTodayBtnclick()');
+
+    setCurrentDate(today_year, today_month, today_date);
+
+    setCurrentYearAndMonthSelectUI()
+
+    ajax_getCurrentDateFranchiseeTotalSales();
+
+}
+
+function searchBtnClick() {
+    console.log('searchBtnClick()');
+
+    ajax_getFranchiseeTotalSalesByInputPeriod();
+
+}
+
+function removeFranchiseeSalesList() {
+    console.log('removeFranchiseeSalesList()');
+
+    $('#section_wrap table tbody tr').remove();
+
+}
+
+function removePageNo() {
+    console.log('removePageNo');
+
+    $('#section_wrap div.page_no_wrap').empty();
+
+}
+
+// ajax - 가맹점 총 매출 불러오기 
+function ajax_getFranchiseeAllSalesInfo(pageNum = 1) {
+    console.log('ajax_getFranchiseeAllSalesInfo');
+
+    $.ajax({
+        url: '/admin/sales/getFranchiseeAllSalesInfo', 
+        method: 'post', 
+        data: { 'page' : pageNum },
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!!');
+
+            removeFranchiseeSalesList();
+            removePageNo();
+
+            let pageDto = data.allFranchiseeSalesListPageDto;
+            let salesDtos = data.franchiseeSalesDtos;
+            let appendTag = '';
+			
+            for (let i = 0; i < salesDtos.length; i++) {
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + salesDtos[i].fcm_no + '</td>';
+                    appendTag += '<td>' + salesDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + salesDtos[i].cash_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + salesDtos[i].card_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + (parseInt(salesDtos[i].card_total_price+salesDtos[i].cash_total_price)).toLocaleString('ko-KR') + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        },
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getFranchiseeAllSalesInfo(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getFranchiseeAllSalesInfo(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getFranchiseeAllSalesInfo(this.getAttribute('page_num'));
+            });
+
+        }
+
+    })
+
+}
+
+// ajax - current date total sales 목록 가져오기 
+function ajax_getCurrentDateFranchiseeTotalSales(pageNum = 1) {
+    console.log('ajax_getCurrentDateFranchiseeTotalSales()');
+
+    let currentDate = {
+        year: current_year,
+        month: current_month,
+        date: current_date,
+        page: pageNum
+    }
+
+    $.ajax({
+        url: '/admin/sales/getSelectDateFranchiseeSalesInfo',
+        method: 'post',
+        data: JSON.stringify(currentDate),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!');
+
+            removeFranchiseeSalesList();
+            removePageNo();
+
+            let pageDto = data.FranchiseeSalesListPageDtoBySelectDate;
+            let selectDtos = data.franchiseeSalesDtosBySelectDate;
+            
+            for (let i = 0; i < selectDtos.length; i++) {
+                let appendTag = '';
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + selectDtos[i].fcm_no + '</td>';
+                    appendTag += '<td>' + selectDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + selectDtos[i].cash_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + selectDtos[i].card_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + (parseInt(selectDtos[i].card_total_price+selectDtos[i].cash_total_price)).toLocaleString('ko-KR') + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+
+        },
+        error: function(data) {
+            console.log('ajax error!!')
+
+        }, 
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getCurrentDateFranchiseeTotalSales(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getCurrentDateFranchiseeTotalSales(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getCurrentDateFranchiseeTotalSales(this.getAttribute('page_num'));
+            });
+
+        }
+
+    })
+
+}
+
+// 선택 기간 회원별 매출 불러오기
+function ajax_getFranchiseeTotalSalesByInputPeriod(pageNum = 1) {
+    console.log('ajax_getFranchiseeTotalSalesByInputPeriod()');
+
+    let startDate = $('input[name="start_date"]').val();
+    let endDate = $('input[name="end_date"]').val();
+    let period = {
+        startDate: startDate,
+        endDate: endDate, 
+        page: pageNum
+    }
+
+    $.ajax({
+        url: '/admin/sales/getFranchiseeTotalSalesByInputPeriod',
+        method: 'post',
+        data: JSON.stringify(period),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log('ajax success!')
+
+            removeFranchiseeSalesList();
+            removePageNo();
+
+            let pageDto = data.franchiseeSalesListPageDtoByInputPeriod;
+            let selectDtos = data.franchiseeSalesDtosByInputPeriod;
+            
+            for (let i = 0; i < selectDtos.length; i++) {
+                let appendTag = '';
+                
+                appendTag = '<tr>';
+                    
+                    appendTag += '<td>' + selectDtos[i].fcm_no + '</td>';
+                    appendTag += '<td>' + selectDtos[i].fcm_name + '</td>';
+                    appendTag += '<td>' + selectDtos[i].cash_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + selectDtos[i].card_total_price.toLocaleString('ko-KR') + '</td>';
+                    appendTag += '<td>' + (parseInt(selectDtos[i].card_total_price + selectDtos[i].cash_total_price)).toLocaleString('ko-KR') + '</td>';
+
+                appendTag += '</tr>';
+
+                $('#section_wrap table tbody').append(appendTag);
+
+            }
+
+            if (pageDto.page <= 1) {
+                $('#section_wrap div.page_no_wrap').append(`<span >&#8810;</span>`);
+                $('#section_wrap div.page_no_wrap').append("<span >[이전]</span>");
+            } else {
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='1'>&#8810;</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="pre_page_btn" page_num='${(pageDto.page-1)}'>[이전]</a>`);
+            }
+
+            for (let i = pageDto.startPage; i <= pageDto.endPage; i++) {
+                let appendPageNum = '';
+
+                appendPageNum += "<span class='page_num_wrap'>";
+                if (i === pageDto.page) {
+                    appendPageNum += "<b style='color:#555'>"+i+"</b>";
+                } else {
+                    appendPageNum += `<a href="#none" class="page_num_btn" page_num='${i}'>${i}</a>`;
+                }
+                appendPageNum += "</span>";
+
+                $('#section_wrap div.page_no_wrap').append(appendPageNum); 
+
+            }
+
+            if(pageDto.page >= pageDto.maxPage){
+                $('#section_wrap div.page_no_wrap').append("<span>[다음]</span>");
+                $('#section_wrap div.page_no_wrap').append(`<span>&#8811;</span>`);
+
+            }else{ 
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.page+1)}'>[다음]</a>`);
+                $('#section_wrap div.page_no_wrap')
+                    .append(`<a style='font-weight: bold' href="#none" class="next_page_btn" page_num='${(pageDto.maxPage)}'>&#8811;</a>`);
+            }
+        },
+        error: function(data) {
+            console.log('ajax error!')
+
+        },
+        complete: function() {
+
+            $('#section_wrap div.page_no_wrap .next_page_btn').click(function(){
+                console.log('nextPageBtnClick()')
+
+                ajax_getFranchiseeTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .pre_page_btn').click(function(){
+                console.log('prePageBtnClick()')
+
+                ajax_getFranchiseeTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+
+            $('#section_wrap div.page_no_wrap .page_num_btn').click(function(){
+                console.log('pageNumBtnClick()')
+
+                ajax_getFranchiseeTotalSalesByInputPeriod(this.getAttribute('page_num'));
+            });
+
+        }
+    })
+
+}
+
+
+</script>

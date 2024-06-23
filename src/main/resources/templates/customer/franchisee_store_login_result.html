@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title th:replace="~{include/include_title.html::title}"></title>
+
+<link rel="stylesheet" th:href="@{/css/customer/common.css}">
+<link rel="stylesheet" th:href="@{/css/customer/home.css}">
+<link rel="stylesheet" th:href="@{/css/customer/franchisee_store_login_result.css}">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<script type="text/javascript" th:src="@{/js/customer/franchisee_store_login_result.js}"></script>
+
+</head>
+<body>
+
+	<div id="wrap">
+		
+		<section>
+		
+			<div id="section_wrap">
+
+				<div class="main">
+
+					<div class="img_box">
+						<!-- <span th:text="${session.loginedFranchiseeStoreDto.fcm_id}"></span>
+						<span th:text="${session.loginedFranchiseeStoreDto.fcs_no}"></span> -->
+						<ul class="img_slide">
+							<li><img src="/img/main/1.png"></li>
+							<li><img src="/img/main/2.png"></li>
+							<li><img src="/img/main/3.png"></li>
+							<li><img src="/img/main/1.png"></li>
+						</ul>
+					</div>
+
+					<!-- <div class="auto_slide">
+						<ul>
+							<li>
+								<img src="/img/1_coffee/3_americano_ice.png">
+								<span>아메리카노(ICED)</span>
+							</li>
+							<li>
+								<img src="/img/1_coffee/9_latte_ice.png">
+								<span>빽`s카페라떼(ICED)</span>
+							</li>
+							<li>
+								<img src="/img/1_coffee/5_mix_coffee_ice.png">
+								<span>다방커피(ICED)</span>
+							</li>
+							<li>
+								<img src="/img/1_coffee/13_caffe_mocha_ice.png">
+								<span>카페모카(ICED)</span>
+							</li>
+						</ul>
+					</div> -->
+
+				</div>
+
+				<div class="option">
+
+					<div class="dine_in">
+						<input type="button" value="매장에서 먹어요" th:fco_packaging="0" th:onclick="dineInOrder(this.getAttribute('fco_packaging'))">
+					</div>
+					<div class="take_out">
+						<input type="button" value="포장해서 갈게요" th:fco_packaging="1" th:onclick="takeOutOrder(this.getAttribute('fco_packaging'))">
+					</div>
+
+				</div>
+
+			</div>
+
+		</section>
+
+	</div>
+
+</body>
+</html>

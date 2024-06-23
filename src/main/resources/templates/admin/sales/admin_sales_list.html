@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title th:replace="~{include/include_title.html::title}"></title>
+
+<script type="text/javascript" th:src="@{/js/admin/member/admin_member.js}"></script>
+
+<link rel="stylesheet" th:href="@{/css/admin/common.css}">
+<link rel="stylesheet" th:href="@{/css/admin/admin_include.css}">
+<link rel="stylesheet" th:href="@{/css/admin/admin_home.css}">
+<link rel="stylesheet" th:href="@{/css/admin/sales/admin_sales_list.css}">
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<script type="text/javascript" th:replace="~{admin/include/section_side_menu_js.html::jquery_js}"></script>
+<script type="text/javascript" th:replace="~{admin/include/admin_sales_list_js.html::admin_sales_list_js}"></script>
+
+</head>
+<body>
+
+	<div id="admin_wrap">
+
+		<header th:replace="~{admin/include/admin_include.html::admin_header}">
+		</header>
+	
+	
+		<nav th:replace="~{admin/include/admin_include.html::admin_nav}">
+		</nav>
+		
+		
+		<section>
+		
+			<div id="section_wrap">
+			
+				<div th:replace="~{admin/include/admin_include.html::admin_section_side_menu}"></div>
+				
+				<div class="admin_section_view_wrap" th:if="${session.loginedAdminMemberDto != null}">
+			
+					<div class="word">
+						매출 목록
+					</div>
+						
+					<div class="admin_sales_list">
+						
+		  				<table>
+							<thead>
+								<tr>
+									<td>NO</td>
+									<td>ORDER NO</td>
+									<td>지점명</td>
+									<td>가맹회원</td>
+									<td>금액</td>
+									<td>결제수단</td>
+									<td>등록일</td>
+									<td>수정일</td>
+								</tr>
+							</thead>
+							
+							<tbody>
+
+							</tbody>
+
+						</table> 
+						
+						<div class="list_total_sales_price">
+							<span>총 매출 : </span> <span class="total_price"></span> <span> 원</span>
+						</div>
+
+						<div class="page_no_wrap">
+						</div>
+						
+					</div>
+
+					<div class="list_search">
+
+						<form>
+							<select name="search_term">
+								<option value="all">전체기간</option>
+								<option value="1d">1일</option>
+								<option value="1w">1주</option>
+								<option value="1m">1개월</option>
+								<option value="6m">6개월</option>
+								<option value="1y">1년</option>
+							</select>
+							<select name="search_value">
+								<option value="fcs_name">지점명</option>
+								<option value="fcm_name">가맹회원</option>
+								<option value="pm_type">결제수단</option>
+							</select>
+							<input type="text" name="search_word" placeholder="검색어를 입력해주세요.">
+							<input type="button" value="search">
+						</form>
+
+					</div>
+					
+					<div class="sales_detail_modal_wrap">
+						<div class="sales_detail_modal">
+	
+							<div class="store_info">
+								<ul>
+									<!-- <li>지점명</li>
+									<li>대표자</li>
+									<li>주소</li>
+									<li>연락처</li>
+									<li>결제수단</li> -->
+								</ul>
+							</div>
+	
+							<div class="order_info">
+								<table>
+									<thead>
+										<tr>
+											<th>메뉴명</th>
+											<th>단가</th>
+											<th>수량</th>
+											<th>금액</th>
+										</tr>
+									</thead>
+									<tbody>
+										
+									</tbody>
+								</table>
+							</div>
+		
+							<div class="price_info">
+								
+							</div>
+		
+							<div class="close_box">
+								close
+							</div>
+		
+						</div>
+					</div>
+				
+				</div>
+				
+				<div class="admin_section_view_wrap" th:unless="${session.loginedAdminMemberDto != null}">
+			
+					<div class="word">
+						매출 목록
+						<br>
+						로그인 후 이용 가능
+						<br>
+						<a th:href="@{/admin/member/adminLoginForm}">로그인</a>
+					</div>
+						
+				</div>
+				
+			</div>
+			
+		</section>
+			
+		
+		<footer th:replace="~{admin/include/admin_include.html::admin_footer}">
+		</footer>
+		
+	</div>
+
+</body>
+</html>

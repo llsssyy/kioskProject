@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title th:replace="~{/include/include_title.html::title}"></title>
+
+<link rel="stylesheet" th:href="@{/css/common.css}">
+<link rel="stylesheet" th:href="@{/css/franchisee/member/franchisee_modify_result.css}">
+
+<script type="text/javascript" th:src="@{/js/franchisee/member/franchisee_member.js}"></script>
+
+</head>
+<body>
+	
+	<header th:replace="~{/franchisee/include/franchisee_include.html::franchisee_header}"></header>
+
+	
+	<nav th:replace="~{/franchisee/include/franchisee_include.html::franchisee_nav}">
+	</nav>
+	
+	
+	<section>
+	
+		<div id="section_wrap">
+			
+			<div class="pos_section_info_wrap">
+				<div class="word">
+					회원 정보 변경에 실패하였습니다.
+					<br>
+					다시 시도해주세요.
+				</div>
+				
+				<div class="others">
+					<a th:href="@{/franchisee/member/franchiseeModifyForm}">정보수정</a>
+				</div>
+				
+			</div>
+			
+			<div class="pos_section_detail_view_wrap">
+
+			</div>
+		
+		</div>
+	
+	</section>
+	
+	
+	<footer th:replace="~{/franchisee/include/franchisee_include.html::franchisee_footer}"></footer>
+	
+</body>
+</html>

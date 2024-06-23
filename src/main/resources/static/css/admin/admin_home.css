@@ -1,0 +1,31 @@
+#admin_wrap {
+    width: 1000px;
+    margin: 0 auto;
+}
+
+#section_wrap {
+    width: 100%;
+}
+
+#section_wrap .admin_section_view_wrap {
+    width: 100%;
+}
+
+#section_wrap .admin_section_view_wrap .word {
+    margin: 20px 0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+#section_wrap .admin_section_view_wrap .word img {
+	width: 260px;
+}
+
+#section_wrap .admin_section_view_wrap .others {
+    text-align: center;
+	margin-bottom: 20px;
+	text-decoration: underline;
+	color: #152f89;
+	font-size: 1.2em;
+}

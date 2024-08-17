@@ -3,7 +3,7 @@ Spring-Boot를 이용한 카페 키오스크 프로그램 Project
 
 ---
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/32556448-b82b-4281-9474-2f2217fc1a40/Untitled.png)
+![1](https://github.com/user-attachments/assets/16250538-75f8-440c-9778-d54aa3c4e1db)
 
 ## 1️⃣ 프로젝트 개요
 
@@ -19,104 +19,104 @@ Spring-Boot를 이용한 카페 키오스크 프로그램 Project
 
 ## 2️⃣ 프로젝트 구성
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/a94bf30c-29bf-4c2e-9df8-ecc33b430fdd/Untitled.png)
+![2](https://github.com/user-attachments/assets/40706598-cf1a-4cce-b6d2-19c4ec1d79ac)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/82fdd71a-6f83-4612-ae65-acb5c0288572/Untitled.png)
+![3](https://github.com/user-attachments/assets/ba952bda-943c-4315-b790-b99f36b8989c)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/e53b38a0-7c59-4ca1-b0af-616a86ffad96/Untitled.png)
+![4](https://github.com/user-attachments/assets/e0dd0751-e702-49b5-855d-b235c03614ca)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/655f4cdc-70c5-4f9c-85cf-0e2a557ae4d9/Untitled.png)
+![5](https://github.com/user-attachments/assets/9724d014-10c4-4349-a2b8-4808fec12667)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/f0ff9398-7455-4661-aa2b-810dc949d27d/Untitled.png)
+![6](https://github.com/user-attachments/assets/5e2856a2-0a35-4f3e-95f5-95e6b0ff9c7b)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/4666e46c-a03c-43f4-8d98-59f77aa2e104/Untitled.png)
+![7](https://github.com/user-attachments/assets/9df35df4-1461-456c-aba4-96a17433ea30)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/9061683f-3725-4a4e-8ada-84d489ff87dc/Untitled.png)
+![8](https://github.com/user-attachments/assets/100d1c49-ed85-42ba-9d6a-9b3b67112943)
 
 - 크게 **Admin, Franchisee, Customer** 기능으로 **나누어서** 프로젝트를 진행하였음.
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/e972ed39-0bad-4cd5-957c-d0c3a55d89b6/Untitled.png)
+![9](https://github.com/user-attachments/assets/0419260b-b3e4-49da-b36e-67c68b462b31)
     
 
 ## 3️⃣ 핵심기능
 
 ### 1. Admin 기능
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/580fdb62-893f-4fa7-9749-e7fe9248a026/Untitled.png)
+![10](https://github.com/user-attachments/assets/bbbf5d87-caa1-4656-8017-bf709bcb0292)
 
 - 신규 **Admin** 회원들의 **Admin**메뉴 이용 **권한 승인** 여부 및 일반 **Admin**의 기능을 모두 이용할 수 있는 **Super Admin**
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/d5d3c436-288c-4ba0-8dbc-ddf5175952b7/Untitled.png)
+![11](https://github.com/user-attachments/assets/c958e788-a9ce-41b4-85e8-e7c2bf299482)
 
 - **가맹점주**들의 **회원관리** 및 **가맹점**들의 **정보와 매출 확인 및 폐점 여부**, 카페 **식.음료 메뉴 관리**를 할 수 있는 **Admin**
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/1e866b78-48f5-418c-bf11-2f187c39dedf/Untitled.png)
+![12](https://github.com/user-attachments/assets/0292b503-20e6-45a5-95af-5bab60253af5)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/cbbc14e6-739a-4de8-bb6f-5709604cd063/Untitled.png)
+![13](https://github.com/user-attachments/assets/c926b58e-0eb3-4250-afab-a14d5079c250)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/c07e26a0-4ce4-4577-82a4-d1228c0a40de/Untitled.png)
+![14](https://github.com/user-attachments/assets/f374c6e6-f68b-4736-9b31-712abb981055)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/f75c7a1b-6eff-49c4-8058-662c5710c311/Untitled.png)
+![15](https://github.com/user-attachments/assets/9d43b2bb-65a3-4c94-8f4b-522185b905ba)
 
 ### 2. Franchisee기능
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/9c81f5e9-c911-4e59-be53-281bb5a1d758/Untitled.png)
+![16](https://github.com/user-attachments/assets/0ac30fc4-29ed-463a-a888-84b736a0a328)
 
 - **가맹점주**를 위한 서비스
     - **자신의 매장** 중 **원하는 매장**을 **선택**하여 서비스를 이용할 수 있다.
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/9f7c039f-7b99-414a-abca-69db5e3c5a2d/Untitled.png)
+![17](https://github.com/user-attachments/assets/84e7643e-f8aa-4f98-b9da-d4aeb888ae7d)
     
 - **카운터**에서 **직접** 주문을 받을 수 있는 기능 구현
     - **키오스크**를 이용하기 불편한 고객들을 위해 **점주**나 **직원**이 **직접** 카운터에서 주문을 받아야 할 때를 대비해 **카운터에**서 직접 **주문을 받는 기능**도 구현하였다.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/7af732a7-e5df-4da1-850b-85092c958ccb/Untitled.png)
+![18](https://github.com/user-attachments/assets/13d55b92-2c25-4747-bfe6-4cd21bd1e279)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/c2cf8f33-4fa7-497d-943e-1c2f3c75f917/Untitled.png)
+![19](https://github.com/user-attachments/assets/2b8c7784-a319-4805-80d6-c1a4f0899990)
 
 - **자신의 매장** 정보 확인 기능
     - 본인 매장의 **주문**을 **조회** 할 수 있는 화면과, 각각의 **매출의 정보**를 한눈에 보기 쉽게 **영수증 형태로 제공**하는 기능도 구현하였다.
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/3ad4a4c8-c7c7-4a10-9005-0112edc5876a/Untitled.png)
+![20](https://github.com/user-attachments/assets/fad7b8c5-8800-4205-8819-dc536af9692a)
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/78d9c3dc-af76-4a58-afa8-47c6192fe9d9/Untitled.png)
+![21](https://github.com/user-attachments/assets/8c9d963c-7a18-438f-b06f-78f91e4cc0d3)
     
 
 ### 3. Customer기능
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/859e07cd-097b-4a17-b8ed-4780744dafb3/Untitled.png)
+![22](https://github.com/user-attachments/assets/ef6e07a1-b401-4b12-b71e-a738d62a245e)
 
 - 실질적으로 **매장**에서 **고객**들이 이용할 수 있는 **키오스크 서비스**로, 프로젝트에서 제일 주력을 기울인 **서비스**
 - 고객은 **매장 식사**와 **포장** 주문 중 **원하는 방식**을 선택하여 **키오스크**를 이용할 수 있음.
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/fbcf58d2-3ef4-43f2-8cc0-3e1e72307506/Untitled.png)
+![23](https://github.com/user-attachments/assets/338648a0-4737-4dfc-b0b9-9e0ce766964d)
     
 - 원하는 **메뉴**를 클릭하면, 선택된 **메뉴**의 원하는 **옵션 추가** 후 **장바구니**에 담을 수 있음
     - **옵션**을 **추가**하면 **실시간**으로 **변동되는 가격**을 확인할 수 있게 구현하였음.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/35cb472a-7dd8-4844-8921-4e7e2993c7ce/Untitled.png)
+![24](https://github.com/user-attachments/assets/8ef3148c-d7b6-42f6-b972-13d66ad75775)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/d0e215e8-15f9-40d9-88a0-afd135c7e5b6/Untitled.png)
+![25](https://github.com/user-attachments/assets/df96b0e0-79d2-4c41-a064-e52dede4adec)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/1a8f5d51-60e7-438d-9f22-3e2ecf335533/Untitled.png)
+![26](https://github.com/user-attachments/assets/7e9ec506-fda1-41bd-9861-a97df9fdd262)
 
 - **장바구니** 기능 구현
     - **동일 음료**의 **다른 옵션**이거나, **다른 음료**를 여러가지 선택하였을 시 **장바구니**에 **각각의 음료**가 담기게 설정하였고, **페이징 기능** 및 메뉴가 추가될 때 마다 **총 결제 금액**이 **실시간**으로 **변경**되게 설계하였음.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/c5ed32f4-fe05-4e08-9595-87b1acc3d172/Untitled.png)
+![27](https://github.com/user-attachments/assets/6230ba2e-3958-44ff-a8c7-4afd16f70152)
 
 - **장바구니**에서 잘못 주문한 메뉴 **취소** 가능!
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/9870f633-7fdd-4d93-9fc7-f26a1cbace10/Untitled.png)
+![28](https://github.com/user-attachments/assets/498f58f2-a652-41e1-a392-fb88b35ca8e3)
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/b6fbd1db-5953-4f90-8c9c-21f232016692/Untitled.png)
+![29](https://github.com/user-attachments/assets/a3166e4f-34ca-4fa9-89e6-57eb8e80d1c9)
 
 - **결제** 화면 구현
     - 원하는 **메뉴**를 모두 **장바구니**에 담은 후 결제하기 버튼을 누르면 본인이 선택한 메뉴를 확인할 수 있는 확인창이 뜨고, 결제 방식을 **선택** 후 결제 **완료** 할 수 있음.
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/f829f987-cbba-4f3e-b872-7895c7a66220/Untitled.png)
+![30](https://github.com/user-attachments/assets/39ff57bf-74ca-4e83-aeca-1b7b732a01f3)
     
-    ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/4b5586b7-f187-4e65-8bba-cb9af3b94c07/eb4adf6d-dfc3-4b35-a5f7-8da818465e18/Untitled.png)
+![31](https://github.com/user-attachments/assets/8642e09b-8ce7-494b-b5d7-82fc5e95c4e8)
     
 
 ## 4️⃣ 프로젝트 파일
